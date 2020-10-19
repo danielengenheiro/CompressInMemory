@@ -7,6 +7,7 @@ using System.Runtime.InteropServices;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Xml;
 
 namespace CompressInMemory
@@ -38,13 +39,18 @@ namespace CompressInMemory
             Console.WriteLine("Start process to zip files...");
             Console.WriteLine();
 
-            foreach(XmlDocument item in xmlDocuments)
-            {
-                new Thread(delegate() {
-                    bytesList.Add(SerializeAndCompress(item.OuterXml));
-                    threadCount++;
-                }).Start();
-            }
+            Parallel.ForEach(xmlDocuments, (item) => {
+                bytesList.Add(SerializeAndCompress(item.OuterXml));
+                threadCount++;
+            });
+
+            //foreach(XmlDocument item in xmlDocuments)
+            //{
+            //    new Thread(delegate() {
+            //        bytesList.Add(SerializeAndCompress(item.OuterXml));
+            //        threadCount++;
+            //    }).Start();
+            //}
 
             while(threadCount < files)
             {
@@ -59,13 +65,19 @@ namespace CompressInMemory
 
             threadCount = 0;
 
-            foreach(byte[] item in bytesList)
+            Parallel.ForEach(bytesList, (item) =>
             {
-                new Thread(delegate () {
-                    DecompressAndDeserialize<string>(item);
-                    threadCount++;
-                }).Start();
-            }
+                DecompressAndDeserialize<string>(item);
+                threadCount++;
+            });
+
+            //foreach(byte[] item in bytesList)
+            //{
+            //    new Thread(delegate () {
+            //        DecompressAndDeserialize<string>(item);
+            //        threadCount++;
+            //    }).Start();
+            //}
 
             while (threadCount < files)
             {
