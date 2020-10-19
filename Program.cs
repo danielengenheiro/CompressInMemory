@@ -21,14 +21,38 @@ namespace CompressInMemory
         static void Main(string[] args)
         {
             int files = 0;
+            bool readFile = false;
+            string readDirectory = string.Empty;
+
+            Console.Write("Do want to read file?(y/N) ");
+            readFile = Console.ReadLine() == "y" ? true : false;
+
+            if (readFile)
+            {
+                Console.WriteLine("Specify directory to read file:");
+                readDirectory = Console.ReadLine();
+            }
+            else
+            {
+                readDirectory = Console.ReadLine();
+            }
 
             Console.WriteLine("How many files you want to manipulate?");
             files = int.Parse(Console.ReadLine());
 
-
             Console.WriteLine(string.Format("Generate {0} big XML file", files));
 
-            XmlDocument xmlDocumentPrincipal = GenereteBigXmlFile();
+            XmlDocument xmlDocumentPrincipal = null;
+
+            if (readFile)
+            {
+                xmlDocumentPrincipal = new XmlDocument();
+                xmlDocumentPrincipal.Load(readDirectory);
+            }
+            else
+            {
+                xmlDocumentPrincipal = GenereteBigXmlFile();
+            }
 
             //Generate files in memory to test.
             for(int i = 0; i < files; i++)
